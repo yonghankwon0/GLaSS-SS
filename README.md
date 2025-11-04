@@ -3,58 +3,58 @@
 [![R](https://img.shields.io/badge/R-276DC3?style=flat&logo=r&logoColor=white)](https://www.r-project.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-고차원 데이터에서 그룹 구조와 상관관계를 동시에 고려한 안정적인 변수 선택 방법
+A robust variable selection method that simultaneously leverages group structure and correlation patterns in high-dimensional data
 
-## 📋 목차
+## 📋 Table of Contents
 
-- [개요](#개요)
-- [주요 기능](#주요-기능)
-- [설치 방법](#설치-방법)
-- [빠른 시작](#빠른-시작)
-- [파일 구조](#파일-구조)
-- [방법론](#방법론)
-- [성능 비교](#성능-비교)
-- [시뮬레이션 연구](#시뮬레이션-연구)
-- [참고 문헌](#참고-문헌)
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [File Structure](#file-structure)
+- [Methodology](#methodology)
+- [Performance Comparison](#performance-comparison)
+- [Simulation Studies](#simulation-studies)
+- [References](#references)
 
-## 개요
+## Overview
 
-GLaSS-SS는 고차원 생물학적 데이터 분석을 위한 강력한 변수 선택 프레임워크입니다. 변수 간 **그룹 구조**와 **상관관계**를 동시에 활용하여 기존 방법보다 안정적이고 해석 가능한 결과를 제공합니다.
+GLaSS-SS is a powerful variable selection framework for high-dimensional biological data analysis. It simultaneously leverages **group structure** and **correlation patterns** among variables to provide more stable and interpretable results compared to existing methods.
 
-### 핵심 특징
+### Core Features
 
-- **적응적 페널티 최적화**: Group Lasso와 Laplacian 정규화를 혼합
-- **안정성 선택**: Stability Selection으로 False Discovery 제어
-- **병렬 처리**: 대규모 데이터셋에서 효율적인 연산
-- **유연한 그룹 구조**: 다양한 그룹 정의 지원
+- **Adaptive Penalty Optimization**: Combines Group Lasso and Laplacian regularization
+- **Stability Selection**: Controls False Discovery Rate through Stability Selection
+- **Parallel Processing**: Efficient computation for large-scale datasets
+- **Flexible Group Structure**: Supports various group definitions
 
-## 주요 기능
+## Key Features
 
-### 1. 그래프 구조 학습
+### 1. Graph Structure Learning
 ```r
-# GLASSO로 최적 인접 행렬 생성
+# Create optimal adjacency matrix using GLASSO
 adj_matrix <- create_optimal_adjacency_glasso(X)
 
-# 상관관계 기반 라플라시안 행렬 생성
+# Generate Laplacian matrix based on correlation structure
 L <- create_laplacian_matrix(X)
 ```
 
-### 2. 적응적 페널티 최적화
+### 2. Adaptive Penalty Optimization
 ```r
-# GLaSS 모델 적합
+# Fit GLaSS model
 result <- fit_adaptive_penalty_optim_noCV(
   X = X_train,
   y = y_train,
   L_sparse = L,
   groups = groups,
-  alpha_seq = seq(0, 1, 0.25),  # Lasso-Laplacian 혼합 비율
+  alpha_seq = seq(0, 1, 0.25),  # Lasso-Laplacian mixing ratio
   nlambda = 10
 )
 ```
 
-### 3. 안정성 선택
+### 3. Stability Selection
 ```r
-# 병렬 안정성 선택
+# Parallel stability selection
 stabsel_result <- my_stabsel_parallel(
   x = X_train,
   y = y_train,
@@ -67,12 +67,12 @@ stabsel_result <- my_stabsel_parallel(
 )
 ```
 
-## 설치 방법
+## Installation
 
-### 필수 패키지 설치
+### Install Required Packages
 
 ```r
-# CRAN 패키지
+# CRAN packages
 install.packages(c(
   "Matrix", "Rcpp", "glmnet", "grpreg",
   "huge", "stabs", "parallel",
@@ -81,47 +81,47 @@ install.packages(c(
 ))
 ```
 
-### GLaSS-SS 다운로드
+### Download GLaSS-SS
 
 ```bash
 git clone https://github.com/yonghankwon0/GLaSS-SS.git
 cd GLaSS-SS
 ```
 
-## 빠른 시작
+## Quick Start
 
-### 간단한 예제 실행
+### Run Simple Example
 
 ```r
-# 예제 스크립트 실행
+# Run example script
 source("example_quick_start.R")
 ```
 
-이 스크립트는 다음을 포함합니다:
-1. **기본 사용법**: 시뮬레이션 데이터로 GLaSS-SS 실행
-2. **방법 비교**: Lasso, Elastic Net과 성능 비교
-3. **시각화**: 선택 확률 분포 확인
+This script includes:
+1. **Basic Usage**: Run GLaSS-SS on simulated data
+2. **Method Comparison**: Compare performance with Lasso and Elastic Net
+3. **Visualization**: Check selection probability distribution
 
-### 직접 실행하기
+### Manual Execution
 
 ```r
-# 1. 메서드 로드
+# 1. Load methods
 source("glass_ss_methods.R")
 
-# 2. 데이터 생성
+# 2. Generate data
 set.seed(123)
 data <- generate_group_data(n = 100, snr = 1, half = 0)
 
-# 3. 훈련 데이터 준비
+# 3. Prepare training data
 train_idx <- sample(1:nrow(data$X), 70)
 X_train <- data$X[train_idx, ]
 y_train <- data$y[train_idx]
 
-# 4. 그룹 및 그래프 구조 정의
+# 4. Define group and graph structure
 groups <- rep(1:3, each = 40)
 L <- create_laplacian_matrix(X_train)
 
-# 5. GLaSS-SS 실행
+# 5. Run GLaSS-SS
 result <- my_stabsel_parallel(
   x = X_train,
   y = y_train,
@@ -139,128 +139,128 @@ result <- my_stabsel_parallel(
   mc.cores = 4
 )
 
-# 6. 결과 확인
+# 6. Check results
 selected_vars <- result[["5"]]$selected
-cat("선택된 변수:", length(selected_vars), "개\n")
+cat("Selected variables:", length(selected_vars), "\n")
 ```
 
-## 파일 구조
+## File Structure
 
 ```
 GLaSS-SS/
-├── glass_ss_methods.R          # 핵심 메서드 구현
-│   ├── 그래프 구조 함수
-│   ├── GLaSS 최적화 알고리즘
-│   ├── 안정성 선택 통합
-│   └── 기준 방법 (Lasso, Elastic Net, Group Lasso)
+├── glass_ss_methods.R          # Core method implementation
+│   ├── Graph structure functions
+│   ├── GLaSS optimization algorithm
+│   ├── Stability selection integration
+│   └── Baseline methods (Lasso, Elastic Net, Group Lasso)
 │
-├── simulation_study.R          # 시뮬레이션 및 성능 평가
-│   ├── 데이터 생성 함수
-│   ├── 안정성 메트릭 계산
-│   ├── 성능 평가 프레임워크
-│   └── 시각화 함수
+├── simulation_study.R          # Simulation and performance evaluation
+│   ├── Data generation functions
+│   ├── Stability metrics calculation
+│   ├── Performance evaluation framework
+│   └── Visualization functions
 │
-├── example_quick_start.R       # 빠른 시작 예제
-│   ├── 기본 사용법
-│   ├── 방법 비교
-│   └── 결과 시각화
+├── example_quick_start.R       # Quick start example
+│   ├── Basic usage
+│   ├── Method comparison
+│   └── Result visualization
 │
-└── README.md                   # 프로젝트 문서
+└── README.md                   # Project documentation
 ```
 
-## 방법론
+## Methodology
 
-### GLaSS-SS 목적 함수
+### GLaSS-SS Objective Function
 
-GLaSS-SS는 다음 목적 함수를 최소화합니다:
+GLaSS-SS minimizes the following objective function:
 
 ```
 minimize: L(β) + λ·α·Σ√(|G_j|)||β_G_j||_2 + λ·(1-α)·β^T L β
 ```
 
-여기서:
-- `L(β)`: 로지스틱 손실 함수
-- `α ∈ [0,1]`: Group Lasso와 Laplacian 정규화의 혼합 비율
-- `G_j`: j번째 그룹의 변수 인덱스
-- `L`: 라플라시안 행렬 (변수 간 상관관계 인코딩)
+Where:
+- `L(β)`: Logistic loss function
+- `α ∈ [0,1]`: Mixing parameter between Group Lasso and Laplacian regularization
+- `G_j`: Variable indices in group j
+- `L`: Laplacian matrix (encoding correlation structure among variables)
 
-### 최적화 알고리즘
+### Optimization Algorithm
 
-**Generalized Forward-Backward Splitting (GFBS)** 알고리즘 사용:
+Uses **Generalized Forward-Backward Splitting (GFBS)** algorithm:
 
-1. **초기화**: β⁰ = 0, 두 개의 보조 변수 z_g⁰, z_l⁰ 설정
-2. **반복**:
-   - Gradient step: 로지스틱 손실의 그래디언트 계산
-   - Proximal operator (Group Lasso): 그룹별 soft-thresholding
-   - Proximal operator (Laplacian): 2차 정규화 해결
-   - 변수 업데이트 및 수렴 확인
+1. **Initialization**: Set β⁰ = 0, two auxiliary variables z_g⁰, z_l⁰
+2. **Iteration**:
+   - Gradient step: Compute gradient of logistic loss
+   - Proximal operator (Group Lasso): Group-wise soft-thresholding
+   - Proximal operator (Laplacian): Solve quadratic regularization
+   - Update variables and check convergence
 
-### 안정성 선택
+### Stability Selection
 
-**Stability Selection** 프레임워크로 False Discovery 제어:
+**Stability Selection** framework for controlling False Discovery:
 
-1. **서브샘플링**: 데이터를 B번 반복 서브샘플링 (보통 B=50-100)
-2. **변수 선택**: 각 서브샘플에서 GLaSS 실행
-3. **선택 확률 계산**: P_hat(j) = (변수 j가 선택된 횟수) / B
-4. **최종 선택**: P_hat(j) > cutoff인 변수만 선택 (보통 cutoff=0.6)
+1. **Subsampling**: Repeatedly subsample data B times (typically B=50-100)
+2. **Variable Selection**: Run GLaSS on each subsample
+3. **Selection Probability**: P_hat(j) = (# times variable j selected) / B
+4. **Final Selection**: Select variables with P_hat(j) > cutoff (typically cutoff=0.6)
 
-**Per-Family Error Rate (PFER) 제어**:
+**Per-Family Error Rate (PFER) Control**:
 ```
 E[FP] ≤ (q²)/(πcutoff - 0.5) ≤ PFER
 ```
 
-## 성능 비교
+## Performance Comparison
 
-### 비교 대상 방법
+### Baseline Methods
 
-1. **Lasso + Stability Selection**: 기본 L1 정규화
-2. **Elastic Net + Stability Selection**: L1 + L2 혼합
-3. **Group Lasso + Stability Selection**: 그룹 구조만 활용
-4. **Elastic Net (CV)**: Cross-validation 기반
-5. **Group Lasso (CV)**: Cross-validation 기반
+1. **Lasso + Stability Selection**: Basic L1 regularization
+2. **Elastic Net + Stability Selection**: L1 + L2 mixture
+3. **Group Lasso + Stability Selection**: Leverages group structure only
+4. **Elastic Net (CV)**: Cross-validation based
+5. **Group Lasso (CV)**: Cross-validation based
 
-### 평가 지표
+### Evaluation Metrics
 
-- **True Positive Rate (TPR)**: 실제 신호 변수의 탐지율
-- **Positive Predictive Value (PPV)**: 선택된 변수 중 실제 신호 비율
-- **F1 Score**: TPR과 PPV의 조화 평균
-- **AUC**: Random Forest 모델의 예측 성능
-- **Nogueira Stability**: 선택의 안정성 측정
-- **Jaccard Stability**: 반복 간 선택 일관성
+- **True Positive Rate (TPR)**: Detection rate of true signal variables
+- **Positive Predictive Value (PPV)**: Proportion of true signals among selected variables
+- **F1 Score**: Harmonic mean of TPR and PPV
+- **AUC**: Prediction performance of Random Forest model
+- **Nogueira Stability**: Measure of selection stability
+- **Jaccard Stability**: Consistency of selections across repetitions
 
-## 시뮬레이션 연구
+## Simulation Studies
 
-### 시뮬레이션 시나리오
+### Simulation Scenarios
 
 ```r
-# simulation_study.R 실행
+# Run simulation_study.R
 source("simulation_study.R")
 ```
 
-테스트 시나리오:
-- **샘플 크기**: n ∈ {60, 120}
+Test scenarios:
+- **Sample Size**: n ∈ {60, 120}
 - **SNR**: Signal-to-Noise Ratio ∈ {1}
-- **신호 패턴**:
+- **Signal Patterns**:
   - Block signal (3 groups)
   - Sparse signal (30% active in groups)
-- **그룹 구조**:
+- **Group Structures**:
   - Well-specified: 6 groups × 20 variables
   - Misspecified: 3 groups × 40 variables
   - Fine-grained: 12 groups × 10 variables
 
-### 결과 출력
+### Output Files
 
-시뮬레이션 실행 시 생성되는 파일:
+Files generated when running simulations:
 ```
 simulation_results_YYYY-MM-DD_HH-MM-SS/
-├── *.txt                       # 상세 결과 로그
-├── sim_result_*.rds            # R 객체 저장
-└── all_plots_*.pdf             # 성능 비교 그래프
+├── *.txt                       # Detailed result logs
+├── sim_result_*.rds            # Saved R objects
+└── all_plots_*.pdf             # Performance comparison plots
 ```
 
-## 참고 문헌
+## References
 
-### 이론적 배경
+### Theoretical Background
 
 1. **Stability Selection**
    Meinshausen, N., & Bühlmann, P. (2010). Stability selection. *Journal of the Royal Statistical Society: Series B*, 72(4), 417-473.
@@ -274,17 +274,17 @@ simulation_results_YYYY-MM-DD_HH-MM-SS/
 4. **Forward-Backward Splitting**
    Combettes, P. L., & Pesquet, J. C. (2011). Proximal splitting methods in signal processing. In *Fixed-point algorithms for inverse problems in science and engineering* (pp. 185-212). Springer.
 
-### 관련 패키지
+### Related Packages
 
 - **stabs**: Stability selection implementation
 - **glmnet**: Lasso and Elastic Net
 - **grpreg**: Group regularization
 - **huge**: High-dimensional graph estimation
 
-## 문의 및 기여
+## Contributing
 
-이슈 및 제안사항은 [GitHub Issues](https://github.com/yonghankwon0/GLaSS-SS/issues)에 등록해주세요.
+Please submit issues and suggestions to [GitHub Issues](https://github.com/yonghankwon0/GLaSS-SS/issues).
 
-## 라이선스
+## License
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+This project is distributed under the MIT License.
